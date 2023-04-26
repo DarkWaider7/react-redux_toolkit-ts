@@ -1,24 +1,34 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { useAppSelector } from "./hooks/redux";
+import { userSlice } from "./store/reducers/UserSlice";
+import { useAppDistpatch } from "./hooks/redux";
+import { fetchUsers } from "./store/reducers/ActionCreators";
+import { useEffect } from "react";
 
 function App() {
+  const { count } = useAppSelector((state) => state.userReducer);
+  const { users, isLoading, error } = useAppSelector(
+    (state) => state.userReducer
+  );
+  const { increment } = userSlice.actions;
+  const distpatch = useAppDistpatch();
+  console.log(error, "--error");
+  console.log(isLoading, "--isLoading");
+
+  useEffect(() => {
+    distpatch(fetchUsers());
+  }, []);
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {isLoading && <h1>LOADING</h1>}
+      {error && <h1>{error}</h1>}
+      {JSON.stringify(users, null, 5)}
+      {!isLoading ? (
+        <div>
+          <h1>{count}</h1>
+          <button onClick={() => distpatch(increment(1))}>click</button>
+        </div>
+      ) : null}
     </div>
   );
 }
